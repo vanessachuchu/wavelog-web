@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A1622">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="浪日誌">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<title>浪日誌 WaveLog</title>
+<style>
+:root {
+  --bg: #0A1622;
+  --card: #122334;
+  --card-alt: #16293C;
+  --line: #1F3850;
+  --text: #EAF2F7;
+  --dim: #8FA8BA;
+  --accent: #4FD1C5;
+  --accent-deep: #2C7A7B;
+  --star: #F6C453;
+  --danger: #FC8181;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  min-height: 100%;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+#app { max-width: 560px; margin: 0 auto; padding: 16px 20px 120px; }
+a { color: var(--accent); text-decoration: none; }
+button { font-family: inherit; }
+
+.topbar { display: flex; justify-content: space-between; align-items: flex-end; padding: 8px 0 20px; }
+.brand { font-size: 30px; font-weight: 800; letter-spacing: 1px; }
+.brand-sub { color: var(--dim); font-size: 11px; letter-spacing: 3px; margin-top: 4px; }
+.topnav { display: flex; gap: 16px; font-size: 15px; }
+.topnav a { padding: 6px 0; }
+
+.pagehead { display: flex; align-items: center; gap: 12px; padding: 4px 0 16px; }
+.back-btn { background: none; border: none; color: var(--accent); font-size: 24px; cursor: pointer; padding: 4px 8px 4px 0; }
+.pagetitle { font-size: 22px; font-weight: 700; }
+
+.section-title { color: var(--dim); font-size: 13px; letter-spacing: 2px; margin: 22px 0 10px; }
+.card {
+  background: var(--card); border: 0.5px solid var(--line);
+  border-radius: 16px; padding: 16px; margin-bottom: 10px;
+}
+.month { color: var(--dim); font-size: 13px; letter-spacing: 1px; margin: 18px 0 8px; }
+
+.session-card { display: flex; gap: 12px; align-items: center; cursor: pointer; }
+.session-card .thumb {
+  width: 64px; height: 64px; border-radius: 12px; object-fit: cover;
+  background: var(--card-alt); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.session-card .info { flex: 1; min-width: 0; }
+.session-card .spot { font-size: 17px; font-weight: 600; }
+.session-card .meta { color: var(--dim); font-size: 13px; margin-top: 2px; }
+.session-card .stars { color: var(--star); font-size: 13px; flex-shrink: 0; }
+
+.fab {
+  position: fixed; bottom: calc(24px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+  width: min(520px, calc(100% - 40px));
+  background: var(--accent); color: #06251F; border: none; border-radius: 999px;
+  padding: 16px; font-size: 17px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0,0,0,.45);
+}
+
+.empty { text-align: center; color: var(--dim); margin-top: 90px; line-height: 1.8; }
+.empty .big { font-size: 44px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 8px 14px; border-radius: 999px; font-size: 14px; cursor: pointer;
+  background: var(--card-alt); border: 1px solid var(--line); color: var(--text);
+}
+.chip.active { background: var(--accent); border-color: var(--accent); color: #06251F; font-weight: 600; }
+
+.field { margin-bottom: 12px; flex: 1; min-width: 0; }
+.field label { display: block; color: var(--dim); font-size: 13px; margin-bottom: 6px; }
+.field input, .field textarea, .field select {
+  width: 100%; background: var(--card-alt); border: 1px solid var(--line);
+  border-radius: 12px; color: var(--text); padding: 10px 12px; font-size: 16px;
+  font-family: inherit; appearance: none; -webkit-appearance: none;
+}
+.field textarea { height: 96px; resize: vertical; }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--accent-deep); }
+.row { display: flex; gap: 10px; }
+
+.btn {
+  display: block; width: 100%; border-radius: 12px; padding: 14px; font-size: 16px;
+  font-weight: 600; cursor: pointer; text-align: center; border: none;
+}
+.btn-accent { background: var(--accent); color: #06251F; }
+.btn-ghost { background: var(--card-alt); color: var(--text); border: 1px solid var(--line); }
+.btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+.btn:disabled { opacity: .5; }
+.btn + .btn { margin-top: 10px; }
+
+.stars-input { display: flex; gap: 6px; }
+.stars-input span { font-size: 32px; color: var(--line); cursor: pointer; }
+.stars-input span.on { color: var(--star); }
+
+.media-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.media-grid .cell {
+  width: 76px; height: 76px; border-radius: 10px; overflow: hidden; position: relative;
+  background: var(--card-alt);
+}
+.media-grid img, .media-grid video { width: 100%; height: 100%; object-fit: cover; }
+.media-grid .vid-badge {
+  position: absolute; bottom: 4px; right: 6px; font-size: 11px;
+  background: rgba(0,0,0,.6); border-radius: 4px; padding: 1px 5px;
+}
+.media-grid .add-cell {
+  width: 76px; height: 76px; border-radius: 10px; border: 1px dashed var(--line);
+  background: var(--card-alt); color: var(--accent); font-size: 28px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.hint { color: var(--dim); font-size: 12px; margin-top: 8px; line-height: 1.6; }
+.note-accent { color: var(--accent); font-size: 13px; margin-top: 10px; line-height: 1.5; }
+
+.stat-grid { display: flex; }
+.stat { flex: 1; text-align: center; }
+.stat .v { font-size: 20px; font-weight: 700; }
+.stat .l { color: var(--dim); font-size: 12px; margin-top: 2px; }
+.forecast-note {
+  color: var(--dim); font-size: 12px; line-height: 1.6; margin-top: 14px;
+  padding-top: 12px; border-top: 0.5px solid var(--line);
+}
+.hero { width: calc(100% + 40px); margin: -16px -20px 0; height: 230px; object-fit: cover; display: block; }
+.detail-spot { font-size: 26px; font-weight: 800; margin-top: 18px; }
+.detail-date { color: var(--dim); font-size: 14px; margin-top: 4px; }
+.link-row { display: flex; gap: 20px; margin-top: 10px; font-size: 14px; flex-wrap: wrap; }
+.body-text { font-size: 15px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
+.ai-meta { color: var(--dim); font-size: 12px; margin-top: 10px; }
+
+.windy-box { border-radius: 16px; overflow: hidden; border: 0.5px solid var(--line); margin-bottom: 10px; }
+.windy-box iframe { width: 100%; height: 320px; border: none; display: block; }
+
+.spot-row { display: flex; align-items: center; gap: 10px; }
+.spot-row .info { flex: 1; }
+.spot-row .name { font-size: 16px; font-weight: 600; }
+.spot-row .coords { color: var(--dim); font-size: 12px; margin-top: 2px; }
+.spot-row .del { color: var(--danger); font-size: 14px; background: none; border: none; cursor: pointer; padding: 8px; }
+
+.syncline { color: var(--dim); font-size: 13px; margin-bottom: 4px; }
+.syncline .warn { color: var(--star); }
+
+#toast {
+  position: fixed; bottom: calc(90px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+  background: var(--card-alt); border: 1px solid var(--line); color: var(--text);
+  border-radius: 999px; padding: 10px 20px; font-size: 14px; max-width: 85%;
+  opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 50; text-align: center;
+}
+#toast.show { opacity: 1; }
+
+#lightbox {
+  position: fixed; inset: 0; background: rgba(4,10,16,.95); z-index: 100;
+  display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+}
+#lightbox.show { display: flex; }
+#lightbox img, #lightbox video { max-width: 96%; max-height: 80%; border-radius: 8px; }
+#lightbox .close { color: var(--text); font-size: 15px; background: var(--card-alt); border: 1px solid var(--line); border-radius: 999px; padding: 10px 24px; cursor: pointer; }
+
+.spinner {
+  display: inline-block; width: 16px; height: 16px; border: 2px solid var(--accent-deep);
+  border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite;
+  vertical-align: -3px; margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<div id="lightbox"><div class="media-holder"></div><button class="close">關閉</button></div>
+
+<script>
+'use strict';
+
+/* ============ 常數 ============ */
+const DEFAULT_MODEL = 'claude-sonnet-5';
+const GH_OWNER_DEFAULT = 'vanessachuchu';
+const GH_REPO_DEFAULT = 'wavelog-data';
+const MAX_VIDEO_MB = 25;
+const SWELLEYE_HOME = 'https://swelleye.com/';
+
+const DEFAULT_SPOTS = [
+  { id: 'waiao', name: '宜蘭外澳', lat: 24.885, lng: 121.845, swelleyeUrl: 'https://swelleye.com/en/surf-spots/waiao/' },
+  { id: 'wushi', name: '烏石港', lat: 24.868, lng: 121.839, swelleyeUrl: '' },
+  { id: 'honeymoon', name: '大溪蜜月灣', lat: 24.938, lng: 121.89, swelleyeUrl: 'https://swelleye.com/en/surf-spots/daxi/' },
+  { id: 'fulong', name: '福隆', lat: 25.016, lng: 121.944, swelleyeUrl: 'https://swelleye.com/en/surf-spots/fulong/' },
+  { id: 'jinshan', name: '金山中角灣', lat: 25.226, lng: 121.616, swelleyeUrl: '' },
+  { id: 'zhunan', name: '竹南假日之森', lat: 24.703, lng: 120.853, swelleyeUrl: '' },
+  { id: 'donghe', name: '台東東河', lat: 22.975, lng: 121.306, swelleyeUrl: 'https://swelleye.com/en/surf-spots/donghe/' },
+  { id: 'jialeshui', name: '墾丁佳樂水', lat: 21.988, lng: 120.858, swelleyeUrl: '' },
+];
+
+/* ============ 小工具 ============ */
+const $ = (sel, el) => (el || document).querySelector(sel);
+const $$ = (sel, el) => Array.from((el || document).querySelectorAll(sel));
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+const num = (s) => { const n = parseFloat(String(s).replace(',', '.')); return Number.isFinite(n) ? n : undefined; };
+const COMPASS = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
+const degToCompass = (deg) => (deg == null || Number.isNaN(deg)) ? '—' : COMPASS[Math.round(deg / 45) % 8];
+
+function nowLocalISO() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function toast(msg, ms = 2600) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+/* ============ IndexedDB ============ */
+let _db = null;
+function openDb() {
+  return new Promise((resolve, reject) => {
+    const r = indexedDB.open('wavelog', 1);
+    r.onupgradeneeded = () => {
+      const d = r.result;
+      d.createObjectStore('sessions', { keyPath: 'id' });
+      d.createObjectStore('media', { keyPath: 'key' });
+      d.createObjectStore('kv', { keyPath: 'k' });
+    };
+    r.onsuccess = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+  });
+}
+async function db() { if (!_db) _db = await openDb(); return _db; }
+function req(r) { return new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function dbGet(store, key) { const d = await db(); return req(d.transaction(store).objectStore(store).get(key)); }
+async function dbGetAll(store) { const d = await db(); return req(d.transaction(store).objectStore(store).getAll()); }
+async function dbPut(store, val) { const d = await db(); return req(d.transaction(store, 'readwrite').objectStore(store).put(val)); }
+async function dbDel(store, key) { const d = await db(); return req(d.transaction(store, 'readwrite').objectStore(store).delete(key)); }
+async function kvGet(k, fallback) { const row = await dbGet('kv', k); return row ? row.v : fallback; }
+async function kvSet(k, v) { await dbPut('kv', { k, v }); }
+async function kvDel(k) { await dbDel('kv', k); }
+
+/* ============ 資料存取 ============ */
+async function getSessions() {
+  const all = await dbGetAll('sessions');
+  return all.sort((a, b) => (a.dateISO < b.dateISO ? 1 : -1));
+}
+async function getSession(id) { return dbGet('sessions', id); }
+async function saveSession(s) { s.updatedAt = new Date().toISOString(); await dbPut('sessions', s); }
+async function getSpots() {
+  let spots = await kvGet('spots');
+  if (!spots || spots.length === 0) { spots = DEFAULT_SPOTS; await kvSet('spots', spots); }
+  return spots;
+}
+async function getSettings() {
+  const s = await kvGet('settings', {});
+  return { model: DEFAULT_MODEL, ghOwner: GH_OWNER_DEFAULT, ghRepo: GH_REPO_DEFAULT, ...s };
+}
+
+/* ============ 媒體 ============ */
+const _urlCache = new Map();
+async function mediaUrl(key) {
+  if (_urlCache.has(key)) return _urlCache.get(key);
+  const row = await dbGet('media', key);
+  if (!row) return null;
+  const url = URL.createObjectURL(row.blob);
+  _urlCache.set(key, url);
+  return url;
+}
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1]);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+async function compressImage(file, maxW = 1280, quality = 0.75) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+    const scale = Math.min(1, maxW / img.naturalWidth);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.naturalWidth * scale);
+    canvas.height = Math.round(img.naturalHeight * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', quality));
+    return blob || file;
+  } catch { return file; } finally { URL.revokeObjectURL(url); }
+}
+async function extractVideoFrames(blob, positions = [0.2, 0.5, 0.8]) {
+  const url = URL.createObjectURL(blob);
+  try {
+    const v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.preload = 'metadata'; v.src = url;
+    await new Promise((res, rej) => { v.onloadedmetadata = res; v.onerror = rej; setTimeout(rej, 8000); });
+    const scale = Math.min(1, 1280 / (v.videoWidth || 1280));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round((v.videoWidth || 640) * scale);
+    canvas.height = Math.round((v.videoHeight || 360) * scale);
+    const ctx = canvas.getContext('2d');
+    const frames = [];
+    for (const p of positions) {
+      v.currentTime = Math.max(0.1, (v.duration || 1) * p);
+      await new Promise((res) => { v.onseeked = res; setTimeout(res, 3000); });
+      ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+      frames.push(canvas.toDataURL('image/jpeg', 0.7).split(',')[1]);
+    }
+    return frames;
+  } finally { URL.revokeObjectURL(url); }
+}
+
+/* ============ Open-Meteo 預報 ============ */
+function nearestHourIndex(times, dateISO) {
+  const wanted = dateISO.slice(0, 13) + ':00';
+  const exact = times.indexOf(wanted);
+  if (exact >= 0) return exact;
+  const sameDay = times.findIndex((t) => t.startsWith(dateISO.slice(0, 10)));
+  return sameDay >= 0 ? sameDay : 0;
+}
+const pickNum = (arr, i) => (Array.isArray(arr) && typeof arr[i] === 'number') ? arr[i] : undefined;
+
+async function fetchForecast(spot, dateISO) {
+  const day = dateISO.slice(0, 10);
+  const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lng}` +
+    `&hourly=wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_period,swell_wave_direction` +
+    `&timezone=Asia%2FTaipei&start_date=${day}&end_date=${day}`;
+  const windUrl = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lng}` +
+    `&hourly=wind_speed_10m,wind_direction_10m,temperature_2m&timezone=Asia%2FTaipei&start_date=${day}&end_date=${day}`;
+  const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(windUrl)]);
+  if (!mRes.ok) throw new Error(`海象資料抓取失敗（${mRes.status}）`);
+  const marine = await mRes.json();
+  const wind = wRes.ok ? await wRes.json() : null;
+  const mTimes = marine?.hourly?.time || [];
+  if (mTimes.length === 0) throw new Error('這個日期抓不到海象資料');
+  const mi = nearestHourIndex(mTimes, dateISO);
+  const snap = {
+    waveHeightM: pickNum(marine.hourly.wave_height, mi),
+    wavePeriodS: pickNum(marine.hourly.wave_period, mi),
+    waveDirectionDeg: pickNum(marine.hourly.wave_direction, mi),
+    swellHeightM: pickNum(marine.hourly.swell_wave_height, mi),
+    swellPeriodS: pickNum(marine.hourly.swell_wave_period, mi),
+    swellDirectionDeg: pickNum(marine.hourly.swell_wave_direction, mi),
+    fetchedAt: new Date().toISOString(),
+    source: 'open-meteo',
+  };
+  const wTimes = wind?.hourly?.time || [];
+  if (wTimes.length > 0) {
+    const wi = nearestHourIndex(wTimes, dateISO);
+    snap.windSpeedKmh = pickNum(wind.hourly.wind_speed_10m, wi);
+    snap.windDirectionDeg = pickNum(wind.hourly.wind_direction_10m, wi);
+    snap.temperatureC = pickNum(wind.hourly.temperature_2m, wi);
+  }
+  return snap;
+}
+function windyEmbedUrl(spot) {
+  return `https://embed.windy.com/embed2.html?lat=${spot.lat}&lon=${spot.lng}&detailLat=${spot.lat}&detailLon=${spot.lng}` +
+    `&zoom=10&level=surface&overlay=waves&menu=&message=true&marker=true&calendar=now&type=map&location=coordinates` +
+    `&metricWind=km%2Fh&metricTemp=%C2%B0C`;
+}
+
+/* ============ AI 分析 ============ */
+function buildAiPrompt(session, spot) {
+  const f = session.forecast;
+  const fmtv = (v, unit) => (v == null ? '未知' : `${v}${unit}`);
+  const forecastText = f ? [
+    `- 浪高 ${fmtv(f.waveHeightM, ' m')}（湧浪 ${fmtv(f.swellHeightM, ' m')}）`,
+    `- 週期 ${fmtv(f.wavePeriodS, ' s')}（湧浪週期 ${fmtv(f.swellPeriodS, ' s')}）`,
+    `- 浪向 ${degToCompass(f.waveDirectionDeg)}、湧浪向 ${degToCompass(f.swellDirectionDeg)}`,
+    `- 風 ${fmtv(f.windSpeedKmh, ' km/h')}，風向 ${degToCompass(f.windDirectionDeg)}`,
+  ].join('\n') : '（這次沒有存到預報快照）';
+  const actual = [
+    session.waveHeightM != null ? `- 我記錄的浪高：約 ${session.waveHeightM} m` : null,
+    session.wavePeriodS != null ? `- 週期：約 ${session.wavePeriodS} s` : null,
+    session.tide ? `- 潮汐：${session.tide}` : null,
+    session.wavesCaught != null ? `- 抓到 ${session.wavesCaught} 道浪` : null,
+    session.rating ? `- 我對今天的評分：${session.rating}/5` : null,
+    session.board ? `- 用的板子：${session.board}` : null,
+    session.focus ? `- 練習重點：${session.focus}` : null,
+    session.notes ? `- 心得：${session.notes}` : null,
+  ].filter(Boolean).join('\n');
+  return `你是衝浪教練兼海象分析師。以下是我 ${session.dateISO.replace('T', ' ')} 在「${spot.name}」的一次衝浪記錄，附上當天的照片（可能包含從影片抽出的畫面，或 Windy／Swelleye 的截圖）。
+
+【當時的預報（Open-Meteo）】
+${forecastText}
+
+【我的實際記錄】
+${actual || '（沒有額外文字記錄）'}
+
+請用繁體中文，以親切但專業的口吻分析（300 字以內，用短段落不要條列狂轟）：
+1. 從照片看到的實際浪況（浪高、乾不乾淨、風的影響、人多不多）
+2. 實際跟預報對不對得上？哪裡準、哪裡不準，可能為什麼
+3. 結合我的評分和心得，給我一個具體建議：這種預報數字出現時，這個浪點值不值得來、適合練什麼`;
+}
+async function analyzeSession(session, spot) {
+  const settings = await getSettings();
+  if (!settings.anthropicKey) throw new Error('請先到「設定」填入 Anthropic API key');
+  const content = [];
+  const images = session.media.filter((m) => m.kind === 'image').slice(0, 3);
+  for (const m of images) {
+    const row = await dbGet('media', m.key);
+    if (row) content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: await blobToBase64(row.blob) } });
+  }
+  const video = session.media.find((m) => m.kind === 'video');
+  if (video && content.length < 5) {
+    const row = await dbGet('media', video.key);
+    if (row) {
+      try {
+        const frames = await extractVideoFrames(row.blob);
+        for (const f of frames.slice(0, 5 - content.length)) {
+          content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: f } });
+        }
+      } catch { /* 影片抽格失敗就略過 */ }
+    }
+  }
+  if (content.length === 0) throw new Error('這筆記錄沒有可用的照片或影片，AI 需要至少一張畫面來對照浪況');
+  content.push({ type: 'text', text: buildAiPrompt(session, spot) });
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': settings.anthropicKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({ model: settings.model, max_tokens: 1024, messages: [{ role: 'user', content }] }),
+  });
+  if (!res.ok) {
+    if (res.status === 401) throw new Error('API key 無效，請到「設定」檢查');
+    const body = await res.text();
+    throw new Error(`AI 分析失敗（${res.status}）：${body.slice(0, 200)}`);
+  }
+  const json = await res.json();
+  const text = (json.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n');
+  if (!text) throw new Error('AI 沒有回傳文字內容');
+  return text;
+}
+
+/* ============ GitHub 同步 ============ */
+function encPath(path) { return path.split('/').map(encodeURIComponent).join('/'); }
+async function ghFetch(path, opts = {}) {
+  const s = await getSettings();
+  if (!s.ghToken) throw new Error('請先到「設定」填入 GitHub token');
+  const headers = {
+    Authorization: `Bearer ${s.ghToken}`,
+    Accept: opts.raw ? 'application/vnd.github.raw+json' : 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+  };
+  const init = { method: opts.method || 'GET', headers };
+  if (opts.body) { headers['content-type'] = 'application/json'; init.body = JSON.stringify(opts.body); }
+  return fetch(`https://api.github.com/repos/${s.ghOwner}/${s.ghRepo}${path}`, init);
+}
+async function ghPushFile(path, base64Content, message) {
+  let sha = await kvGet('sha:' + path);
+  const attempt = async (shaArg) => ghFetch(`/contents/${encPath(path)}`, {
+    method: 'PUT',
+    body: { message, content: base64Content, ...(shaArg ? { sha: shaArg } : {}) },
+  });
+  let res = await attempt(sha);
+  if (res.status === 409 || res.status === 422) {
+    const cur = await ghFetch(`/contents/${encPath(path)}`);
+    sha = cur.ok ? (await cur.json()).sha : undefined;
+    res = await attempt(sha);
+  }
+  if (!res.ok) {
+    if (res.status === 401) throw new Error('GitHub token 無效或過期');
+    if (res.status === 404) throw new Error(`找不到 repo（${path}）——請確認設定的帳號/repo 正確、token 有權限`);
+    throw new Error(`上傳 ${path} 失敗（${res.status}）`);
+  }
+  const j = await res.json();
+  await kvSet('sha:' + path, j.content.sha);
+}
+async function ghDeleteFile(path, message) {
+  let sha = await kvGet('sha:' + path);
+  if (!sha) {
+    const cur = await ghFetch(`/contents/${encPath(path)}`);
+    if (cur.status === 404) { await kvDel('sha:' + path); return; }
+    if (!cur.ok) throw new Error(`讀取 ${path} 失敗（${cur.status}）`);
+    sha = (await cur.json()).sha;
+  }
+  const res = await ghFetch(`/contents/${encPath(path)}`, { method: 'DELETE', body: { message, sha } });
+  if (!res.ok && res.status !== 404) throw new Error(`刪除 ${path} 失敗（${res.status}）`);
+  await kvDel('sha:' + path);
+}
+function sessionCloudJson(s) {
+  const clone = { ...s };
+  delete clone.synced;
+  return btoa(unescape(encodeURIComponent(JSON.stringify(clone, null, 2))));
+}
+async function syncNow(silent = false) {
+  const s = await getSettings();
+  if (!s.ghToken) { if (!silent) toast('請先到「設定」填 GitHub token 才能同步'); return false; }
+  try {
+    // 1. 待刪除的雲端檔案
+    const tombstones = await kvGet('tombstones', []);
+    for (const path of [...tombstones]) {
+      await ghDeleteFile(path, `wavelog: 刪除 ${path}`);
+      tombstones.splice(tombstones.indexOf(path), 1);
+      await kvSet('tombstones', tombstones);
+    }
+    // 2. 浪點
+    if (await kvGet('dirty:spots')) {
+      const spots = await getSpots();
+      await ghPushFile('spots.json', btoa(unescape(encodeURIComponent(JSON.stringify(spots, null, 2)))), 'wavelog: 更新浪點');
+      await kvDel('dirty:spots');
+    }
+    // 3. 未同步的記錄（先媒體、後 JSON）
+    const sessions = await getSessions();
+    let pushed = 0;
+    for (const session of sessions.filter((x) => !x.synced)) {
+      for (const m of session.media) {
+        const remotePath = `media/${session.id}/${m.key}`;
+        if (await kvGet('sha:' + remotePath)) continue;
+        const row = await dbGet('media', m.key);
+        if (!row) continue;
+        await ghPushFile(remotePath, await blobToBase64(row.blob), `wavelog: ${session.id} 媒體`);
+      }
+      await ghPushFile(`sessions/${session.id}.json`, sessionCloudJson(session), `wavelog: 記錄 ${session.dateISO}`);
+      session.synced = true;
+      await dbPut('sessions', session);
+      pushed++;
+    }
+    await kvSet('lastSync', new Date().toISOString());
+    if (!silent) toast(pushed > 0 ? `已同步 ${pushed} 筆記錄到 GitHub` : '雲端已是最新');
+    return true;
+  } catch (e) {
+    if (!silent) toast('同步失敗：' + e.message, 4000);
+    return false;
+  }
+}
+async function restoreFromCloud() {
+  const listRes = await ghFetch('/contents/sessions');
+  if (listRes.status === 404) { toast('雲端還沒有任何記錄'); return; }
+  if (!listRes.ok) throw new Error(`讀取雲端清單失敗（${listRes.status}）`);
+  const files = await listRes.json();
+  let restored = 0;
+  for (const f of files.filter((x) => x.name.endsWith('.json'))) {
+    const raw = await ghFetch(`/contents/${encPath('sessions/' + f.name)}`, { raw: true });
+    if (!raw.ok) continue;
+    const session = JSON.parse(await raw.text());
+    session.synced = true;
+    await kvSet('sha:sessions/' + f.name, f.sha);
+    // 媒體
+    const mediaList = await ghFetch(`/contents/${encPath('media/' + session.id)}`);
+    if (mediaList.ok) {
+      for (const mf of await mediaList.json()) {
+        const exists = await dbGet('media', mf.name);
+        if (!exists) {
+          const mRaw = await ghFetch(`/contents/${encPath(`media/${session.id}/${mf.name}`)}`, { raw: true });
+          if (mRaw.ok) {
+            const buf = await mRaw.arrayBuffer();
+            const kind = /\.(mp4|mov|webm|m4v)$/i.test(mf.name) ? 'video' : 'image';
+            const type = kind === 'video' ? 'video/mp4' : 'image/jpeg';
+            await dbPut('media', { key: mf.name, blob: new Blob([buf], { type }), kind });
+          }
+        }
+        await kvSet(`sha:media/${session.id}/${mf.name}`, mf.sha);
+      }
+    }
+    await dbPut('sessions', session);
+    restored++;
+  }
+  // 浪點
+  const spotsRaw = await ghFetch('/contents/spots.json', { raw: true });
+  if (spotsRaw.ok) await kvSet('spots', JSON.parse(await spotsRaw.text()));
+  toast(`已從雲端還原 ${restored} 筆記錄`);
+}
+
+/* ============ 匯出備份 ============ */
+async function exportBackup() {
+  const data = { app: 'wavelog', exportedAt: new Date().toISOString(), sessions: await getSessions(), spots: await getSpots() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const name = `wavelog-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  const file = new File([blob], name, { type: 'application/json' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: '浪日誌備份' }); return; } catch { /* 使用者取消就走下載 */ }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+/* ============ Lightbox ============ */
+async function openLightbox(m) {
+  const url = await mediaUrl(m.key);
+  if (!url) return;
+  const holder = $('#lightbox .media-holder');
+  holder.innerHTML = m.kind === 'video'
+    ? `<video src="${url}" controls autoplay playsinline></video>`
+    : `<img src="${url}" alt="">`;
+  $('#lightbox').classList.add('show');
+}
+$('#lightbox .close').addEventListener('click', () => {
+  $('#lightbox').classList.remove('show');
+  $('#lightbox .media-holder').innerHTML = '';
+});
+
+/* ============ 畫面：首頁 ============ */
+async function renderHome() {
+  const [sessions, spots, lastSync] = await Promise.all([getSessions(), getSpots(), kvGet('lastSync')]);
+  const spotMap = Object.fromEntries(spots.map((s) => [s.id, s]));
+  const unsynced = sessions.filter((s) => !s.synced).length;
+
+  let listHtml = '';
+  let lastMonth = '';
+  for (const s of sessions) {
+    const month = `${s.dateISO.slice(0, 4)} 年 ${Number(s.dateISO.slice(5, 7))} 月`;
+    if (month !== lastMonth) { listHtml += `<div class="month">${month}</div>`; lastMonth = month; }
+    const spot = spotMap[s.spotId];
+    const firstImg = s.media.find((m) => m.kind === 'image');
+    listHtml += `
+      <div class="card session-card" data-id="${s.id}">
+        ${firstImg ? `<img class="thumb" data-media="${esc(firstImg.key)}" alt="">` : `<div class="thumb">🌊</div>`}
+        <div class="info">
+          <div class="spot">${esc(spot ? spot.name : '未知浪點')}</div>
+          <div class="meta">${s.dateISO.slice(5, 10).replace('-', '/')} ${s.dateISO.slice(11, 16)} · ${Math.round(s.durationMin / 6) / 10} 小時</div>
+          <div class="meta">${s.waveHeightM != null ? `浪高 ${s.waveHeightM} m` : '浪況未記錄'}${s.wavesCaught != null ? ` · ${s.wavesCaught} 道浪` : ''}</div>
+        </div>
+        <div class="stars">${'★'.repeat(s.rating || 0)}</div>
+      </div>`;
+  }
+
+  $('#app').innerHTML = `
+    <div class="topbar">
+      <div>
+        <div class="brand">浪日誌</div>
+        <div class="brand-sub">WAVELOG · ${sessions.length} 次下水</div>
+      </div>
+      <div class="topnav"><a href="#/spots">浪點</a><a href="#/settings">設定</a></div>
+    </div>
+    <div class="syncline" id="syncline">
+      ${unsynced > 0 ? `<span class="warn">● ${unsynced} 筆未同步</span> · ` : ''}
+      ${lastSync ? `上次同步 ${lastSync.slice(5, 16).replace('T', ' ')}` : '尚未同步過'} · <a href="#" id="sync-now">立即同步</a>
+    </div>
+    ${sessions.length === 0 ? `<div class="empty"><div class="big">🏄‍♀️</div><p>還沒有記錄。<br>下水回來，按下面的按鈕記下今天的浪。</p></div>` : listHtml}
+    <button class="fab" id="fab">＋ 記錄一次下水</button>`;
+
+  $('#fab').addEventListener('click', () => { location.hash = '#/new'; });
+  $('#sync-now').addEventListener('click', async (e) => {
+    e.preventDefault();
+    $('#syncline').innerHTML = '<span class="spinner"></span>同步中…';
+    await syncNow();
+    renderHome();
+  });
+  $$('.session-card').forEach((el) => el.addEventListener('click', () => { location.hash = '#/session/' + el.dataset.id; }));
+  $$('[data-media]').forEach(async (img) => { const url = await mediaUrl(img.dataset.media); if (url) img.src = url; });
+}
+
+/* ============ 畫面：新增／編輯 ============ */
+async function renderEdit(editId) {
+  const spots = await getSpots();
+  const existing = editId ? await getSession(editId) : null;
+  const id = existing ? existing.id : uid();
+  const state = {
+    spotId: existing ? existing.spotId : (spots[0] && spots[0].id),
+    durationMin: existing ? existing.durationMin : 120,
+    rating: existing ? existing.rating : 3,
+    forecast: existing ? existing.forecast : undefined,
+    media: existing ? [...existing.media] : [],       // 已存在 IndexedDB 的
+    pending: [],                                       // 新加、還在記憶體的 {key, kind, blob}
+    removed: new Set(),
+  };
+
+  const durBtns = [60, 90, 120, 180, 240].map((d) =>
+    `<span class="chip dur ${state.durationMin === d ? 'active' : ''}" data-d="${d}">${d / 60} 小時</span>`).join('');
+
+  $('#app').innerHTML = `
+    <div class="pagehead"><button class="back-btn" id="back">‹</button><div class="pagetitle">${existing ? '編輯記錄' : '記錄一次下水'}</div></div>
+
+    <div class="section-title">浪點</div>
+    <div class="chips" id="spot-chips">
+      ${spots.map((s) => `<span class="chip spot ${s.id === state.spotId ? 'active' : ''}" data-id="${s.id}">${esc(s.name)}</span>`).join('')}
+    </div>
+
+    <div class="section-title">時間與時長</div>
+    <div class="field"><input type="datetime-local" id="f-date" value="${existing ? existing.dateISO : nowLocalISO()}"></div>
+    <div class="chips" id="dur-chips">${durBtns}</div>
+
+    <div class="section-title">浪況</div>
+    <div id="windy-slot"><button class="btn btn-ghost" id="show-windy">🌀 顯示 Windy 浪圖</button></div>
+    <div style="height:10px"></div>
+    <button class="btn btn-ghost" id="grab-forecast">⚡ 抓當時的預報（Open-Meteo）</button>
+    <div class="note-accent" id="forecast-note" ${state.forecast ? '' : 'hidden'}>${state.forecast ? forecastNoteText(state.forecast) : ''}</div>
+    <div style="height:12px"></div>
+    <div class="row">
+      <div class="field"><label>浪高（m）</label><input id="f-waveh" inputmode="decimal" value="${existing?.waveHeightM ?? ''}"></div>
+      <div class="field"><label>週期（s）</label><input id="f-period" inputmode="decimal" value="${existing?.wavePeriodS ?? ''}"></div>
+      <div class="field"><label>浪向</label><input id="f-wavedir" placeholder="東北" value="${esc(existing?.waveDirection ?? '')}"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>風速（km/h）</label><input id="f-winds" inputmode="decimal" value="${existing?.windSpeedKmh ?? ''}"></div>
+      <div class="field"><label>風向</label><input id="f-winddir" placeholder="西南" value="${esc(existing?.windDirection ?? '')}"></div>
+      <div class="field"><label>潮汐</label><input id="f-tide" placeholder="漲潮中" value="${esc(existing?.tide ?? '')}"></div>
+    </div>
+
+    <div class="section-title">個人表現</div>
+    <div class="field"><label>今天整體如何？</label><div class="stars-input" id="stars">${[1,2,3,4,5].map((n) => `<span data-n="${n}" class="${n <= state.rating ? 'on' : ''}">★</span>`).join('')}</div></div>
+    <div class="row">
+      <div class="field"><label>抓到幾道浪</label><input id="f-caught" inputmode="numeric" value="${existing?.wavesCaught ?? ''}"></div>
+      <div class="field" style="flex:2"><label>板子</label><input id="f-board" placeholder="9'0 長板" value="${esc(existing?.board ?? '')}"></div>
+    </div>
+    <div class="field"><label>練習重點</label><input id="f-focus" placeholder="追浪時機、cross step…" value="${esc(existing?.focus ?? '')}"></div>
+    <div class="field"><label>心得</label><textarea id="f-notes" placeholder="今天的浪、自己的狀態、下次想調整什麼…">${esc(existing?.notes ?? '')}</textarea></div>
+
+    <div class="section-title">照片／影片</div>
+    <div class="media-grid" id="media-grid"></div>
+    <input type="file" id="f-media" accept="image/*,video/*" multiple hidden>
+    <div class="hint">點縮圖可移除。AI 分析會用前 3 張照片＋第 1 支影片的畫面。小技巧：把 Windy 或 Swelleye 攝影機截圖也加進來，AI 會一起比對。影片單支上限 ${MAX_VIDEO_MB}MB。</div>
+
+    <div style="height:24px"></div>
+    <button class="btn btn-accent" id="save">${existing ? '儲存變更' : '存下這次下水'}</button>`;
+
+  function forecastNoteText(f) {
+    return `已存預報快照：浪 ${f.waveHeightM ?? '?'} m / 週期 ${f.swellPeriodS ?? f.wavePeriodS ?? '?'} s / 風 ${f.windSpeedKmh ?? '?'} km/h（AI 分析會拿它跟照片對照）`;
+  }
+  async function drawMediaGrid() {
+    const grid = $('#media-grid');
+    const cells = [];
+    for (const m of state.media.filter((x) => !state.removed.has(x.key))) {
+      const url = await mediaUrl(m.key);
+      cells.push({ key: m.key, kind: m.kind, url, pending: false });
+    }
+    for (const p of state.pending) {
+      if (!p._url) p._url = URL.createObjectURL(p.blob);
+      cells.push({ key: p.key, kind: p.kind, url: p._url, pending: true });
+    }
+    grid.innerHTML = cells.map((c) => `
+      <div class="cell" data-key="${esc(c.key)}" data-pending="${c.pending}">
+        ${c.kind === 'video' ? `<video src="${c.url}" muted playsinline></video><span class="vid-badge">影片</span>` : `<img src="${c.url}" alt="">`}
+      </div>`).join('') + `<div class="add-cell" id="add-media">＋</div>`;
+    $('#add-media').addEventListener('click', () => $('#f-media').click());
+    $$('.cell', grid).forEach((cell) => cell.addEventListener('click', () => {
+      if (!confirm('移除這個檔案？')) return;
+      if (cell.dataset.pending === 'true') {
+        const i = state.pending.findIndex((p) => p.key === cell.dataset.key);
+        if (i >= 0) state.pending.splice(i, 1);
+      } else {
+        state.removed.add(cell.dataset.key);
+      }
+      drawMediaGrid();
+    }));
+  }
+  await drawMediaGrid();
+
+  $('#back').addEventListener('click', () => history.back());
+  $$('#spot-chips .spot').forEach((c) => c.addEventListener('click', () => {
+    state.spotId = c.dataset.id;
+    $$('#spot-chips .spot').forEach((x) => x.classList.toggle('active', x === c));
+    $('#windy-slot').innerHTML = '<button class="btn btn-ghost" id="show-windy">🌀 顯示 Windy 浪圖</button>';
+    wireWindy();
+  }));
+  $$('#dur-chips .dur').forEach((c) => c.addEventListener('click', () => {
+    state.durationMin = Number(c.dataset.d);
+    $$('#dur-chips .dur').forEach((x) => x.classList.toggle('active', x === c));
+  }));
+  $$('#stars span').forEach((s) => s.addEventListener('click', () => {
+    state.rating = Number(s.dataset.n);
+    $$('#stars span').forEach((x) => x.classList.toggle('on', Number(x.dataset.n) <= state.rating));
+  }));
+  function wireWindy() {
+    const btn = $('#show-windy');
+    if (btn) btn.addEventListener('click', () => {
+      const spot = spots.find((s) => s.id === state.spotId);
+      if (spot) $('#windy-slot').innerHTML = `<div class="windy-box"><iframe src="${windyEmbedUrl(spot)}" loading="lazy"></iframe></div>`;
+    });
+  }
+  wireWindy();
+
+  $('#grab-forecast').addEventListener('click', async () => {
+    const spot = spots.find((s) => s.id === state.spotId);
+    if (!spot) return;
+    const btn = $('#grab-forecast');
+    btn.disabled = true; btn.textContent = '抓取中…';
+    try {
+      const snap = await fetchForecast(spot, $('#f-date').value || nowLocalISO());
+      state.forecast = snap;
+      if (snap.waveHeightM != null) $('#f-waveh').value = snap.waveHeightM;
+      const period = snap.swellPeriodS ?? snap.wavePeriodS;
+      if (period != null) $('#f-period').value = period;
+      if (snap.swellDirectionDeg != null) $('#f-wavedir').value = degToCompass(snap.swellDirectionDeg);
+      if (snap.windSpeedKmh != null) $('#f-winds').value = snap.windSpeedKmh;
+      if (snap.windDirectionDeg != null) $('#f-winddir').value = degToCompass(snap.windDirectionDeg);
+      const note = $('#forecast-note');
+      note.hidden = false;
+      note.textContent = forecastNoteText(snap);
+    } catch (e) { toast('抓不到預報：' + e.message, 3500); }
+    btn.disabled = false; btn.textContent = '⚡ 抓當時的預報（Open-Meteo）';
+  });
+
+  $('#f-media').addEventListener('change', async (e) => {
+    for (const file of Array.from(e.target.files || [])) {
+      if (file.type.startsWith('video/')) {
+        if (file.size > MAX_VIDEO_MB * 1024 * 1024) { toast(`影片「${file.name}」超過 ${MAX_VIDEO_MB}MB，請剪短一點再加`, 4000); continue; }
+        state.pending.push({ key: `${id}-${uid()}.${(file.name.split('.').pop() || 'mp4').toLowerCase()}`, kind: 'video', blob: file });
+      } else if (file.type.startsWith('image/')) {
+        const blob = await compressImage(file);
+        state.pending.push({ key: `${id}-${uid()}.jpg`, kind: 'image', blob });
+      }
+    }
+    e.target.value = '';
+    drawMediaGrid();
+  });
+
+  $('#save').addEventListener('click', async () => {
+    if (!state.spotId) { toast('請選一個浪點'); return; }
+    const dateISO = $('#f-date').value || nowLocalISO();
+    // 寫入新媒體
+    for (const p of state.pending) {
+      await dbPut('media', { key: p.key, blob: p.blob, kind: p.kind, sessionId: id });
+      if (p._url) URL.revokeObjectURL(p._url);
+    }
+    // 處理移除
+    const tombstones = await kvGet('tombstones', []);
+    for (const key of state.removed) {
+      await dbDel('media', key);
+      const remotePath = `media/${id}/${key}`;
+      if (await kvGet('sha:' + remotePath)) tombstones.push(remotePath);
+    }
+    if (tombstones.length) await kvSet('tombstones', tombstones);
+
+    const media = [...state.media.filter((m) => !state.removed.has(m.key)), ...state.pending.map((p) => ({ key: p.key, kind: p.kind }))];
+    const session = {
+      id, dateISO, spotId: state.spotId, durationMin: state.durationMin,
+      board: $('#f-board').value.trim() || undefined,
+      waveHeightM: num($('#f-waveh').value), wavePeriodS: num($('#f-period').value),
+      waveDirection: $('#f-wavedir').value.trim() || undefined,
+      windSpeedKmh: num($('#f-winds').value), windDirection: $('#f-winddir').value.trim() || undefined,
+      tide: $('#f-tide').value.trim() || undefined,
+      forecast: state.forecast,
+      rating: state.rating, wavesCaught: num($('#f-caught').value),
+      focus: $('#f-focus').value.trim() || undefined,
+      notes: $('#f-notes').value.trim() || undefined,
+      media,
+      aiAnalysis: existing?.aiAnalysis, aiAnalyzedAt: existing?.aiAnalyzedAt,
+      synced: false,
+    };
+    await saveSession(session);
+    toast('已儲存');
+    location.hash = '#/session/' + id;
+    syncNow(true); // 背景嘗試同步，失敗不吵
+  });
+}
+
+/* ============ 畫面：詳細 ============ */
+async function renderDetail(id) {
+  const session = await getSession(id);
+  if (!session) { location.hash = '#/'; return; }
+  const spots = await getSpots();
+  const spot = spots.find((s) => s.id === session.spotId);
+  const f = session.forecast;
+  const firstImg = session.media.find((m) => m.kind === 'image');
+
+  $('#app').innerHTML = `
+    <div class="pagehead"><button class="back-btn" id="back">‹</button><div class="pagetitle"></div></div>
+    ${firstImg ? `<img class="hero" data-media="${esc(firstImg.key)}" alt="">` : ''}
+    <div class="detail-spot">${esc(spot ? spot.name : '未知浪點')}</div>
+    <div class="detail-date">${session.dateISO.replace('T', ' ')} · ${Math.round(session.durationMin / 6) / 10} 小時${session.board ? ' · ' + esc(session.board) : ''}</div>
+    <div style="margin-top:8px;color:var(--star);font-size:20px">${'★'.repeat(session.rating || 0)}<span style="color:var(--line)">${'★'.repeat(5 - (session.rating || 0))}</span></div>
+
+    <div class="section-title">當天浪況</div>
+    <div class="card">
+      <div class="stat-grid">
+        <div class="stat"><div class="v">${session.waveHeightM != null ? session.waveHeightM + ' m' : '—'}</div><div class="l">浪高</div></div>
+        <div class="stat"><div class="v">${session.wavePeriodS != null ? session.wavePeriodS + ' s' : '—'}</div><div class="l">週期</div></div>
+        <div class="stat"><div class="v">${esc(session.waveDirection ?? '—')}</div><div class="l">浪向</div></div>
+      </div>
+      <div class="stat-grid" style="margin-top:14px">
+        <div class="stat"><div class="v">${session.windSpeedKmh != null ? session.windSpeedKmh : '—'}</div><div class="l">風速 km/h</div></div>
+        <div class="stat"><div class="v">${esc(session.windDirection ?? '—')}</div><div class="l">風向</div></div>
+        <div class="stat"><div class="v">${esc(session.tide ?? '—')}</div><div class="l">潮汐</div></div>
+      </div>
+      ${f ? `<div class="forecast-note">預報快照：浪 ${f.waveHeightM ?? '?'} m · 湧浪 ${f.swellHeightM ?? '?'} m / ${f.swellPeriodS ?? '?'} s · 湧向 ${degToCompass(f.swellDirectionDeg)} · 風 ${f.windSpeedKmh ?? '?'} km/h ${degToCompass(f.windDirectionDeg)}</div>` : ''}
+    </div>
+    ${spot ? `
+    <div class="link-row">
+      <a href="#" id="toggle-windy">🌀 Windy 浪圖</a>
+      <a href="${esc(spot.swelleyeUrl || SWELLEYE_HOME)}" target="_blank" rel="noopener">Swelleye ↗</a>
+      <a href="https://www.windy.com/${spot.lat.toFixed(3)}/${spot.lng.toFixed(3)}?waves,${spot.lat.toFixed(3)},${spot.lng.toFixed(3)},11" target="_blank" rel="noopener">開 Windy 網站 ↗</a>
+    </div>
+    <div id="windy-slot" style="margin-top:10px"></div>` : ''}
+
+    ${(session.wavesCaught != null || session.focus || session.notes) ? `
+    <div class="section-title">表現與心得</div>
+    <div class="card">
+      ${session.wavesCaught != null ? `<div style="font-weight:700;margin-bottom:6px">抓到 ${session.wavesCaught} 道浪</div>` : ''}
+      ${session.focus ? `<div class="body-text">練習重點：${esc(session.focus)}</div>` : ''}
+      ${session.notes ? `<div class="body-text" style="margin-top:8px">${esc(session.notes)}</div>` : ''}
+    </div>` : ''}
+
+    ${session.media.length > 0 ? `
+    <div class="section-title">照片／影片</div>
+    <div class="media-grid" id="detail-media">
+      ${session.media.map((m) => `<div class="cell" data-key="${esc(m.key)}" data-kind="${m.kind}">${m.kind === 'video' ? `<video data-media="${esc(m.key)}" muted playsinline></video><span class="vid-badge">影片</span>` : `<img data-media="${esc(m.key)}" alt="">`}</div>`).join('')}
+    </div>` : ''}
+
+    <div class="section-title">AI 浪況分析</div>
+    <div class="card" id="ai-card" ${session.aiAnalysis ? 'style="border-color:var(--accent-deep)"' : ''}>
+      ${session.aiAnalysis
+        ? `<div class="body-text">${esc(session.aiAnalysis)}</div><div class="ai-meta">分析於 ${(session.aiAnalyzedAt || '').slice(0, 16).replace('T', ' ')}</div><div style="height:12px"></div><button class="btn btn-ghost" id="ai-run">重新分析</button>`
+        : `<div class="body-text" style="color:var(--dim)">把當天照片／影片畫面、預報快照和你的心得一起交給 Claude，看看預報準不準、這樣的數字值不值得再來。</div><div style="height:12px"></div><button class="btn btn-accent" id="ai-run">✨ AI 分析這次浪況</button>`}
+    </div>
+
+    <div style="height:24px"></div>
+    <button class="btn btn-ghost" id="edit">編輯這筆記錄</button>
+    <button class="btn btn-danger" id="del">刪除</button>`;
+
+  $('#back').addEventListener('click', () => { location.hash = '#/'; });
+  $('#edit').addEventListener('click', () => { location.hash = '#/edit/' + id; });
+  $('#del').addEventListener('click', async () => {
+    if (!confirm('刪除這筆記錄？刪掉就回不來了。')) return;
+    const tombstones = await kvGet('tombstones', []);
+    if (session.synced) tombstones.push(`sessions/${id}.json`);
+    for (const m of session.media) {
+      await dbDel('media', m.key);
+      const remotePath = `media/${id}/${m.key}`;
+      if (await kvGet('sha:' + remotePath)) tombstones.push(remotePath);
+    }
+    if (tombstones.length) await kvSet('tombstones', tombstones);
+    await dbDel('sessions', id);
+    toast('已刪除');
+    location.hash = '#/';
+    syncNow(true);
+  });
+  const toggleWindy = $('#toggle-windy');
+  if (toggleWindy) toggleWindy.addEventListener('click', (e) => {
+    e.preventDefault();
+    const slot = $('#windy-slot');
+    slot.innerHTML = slot.innerHTML ? '' : `<div class="windy-box"><iframe src="${windyEmbedUrl(spot)}" loading="lazy"></iframe></div>`;
+  });
+  const detailMedia = $('#detail-media');
+  if (detailMedia) $$('.cell', detailMedia).forEach((cell) => cell.addEventListener('click', () => {
+    openLightbox({ key: cell.dataset.key, kind: cell.dataset.kind });
+  }));
+  $('#ai-run').addEventListener('click', async () => {
+    const btn = $('#ai-run');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>看照片、比對預報中…';
+    try {
+      const text = await analyzeSession(session, spot || { name: '未知浪點' });
+      session.aiAnalysis = text;
+      session.aiAnalyzedAt = new Date().toISOString();
+      session.synced = false;
+      await saveSession(session);
+      syncNow(true);
+      renderDetail(id);
+    } catch (e) {
+      toast(e.message, 4500);
+      btn.disabled = false;
+      btn.textContent = session.aiAnalysis ? '重新分析' : '✨ AI 分析這次浪況';
+    }
+  });
+  $$('[data-media]').forEach(async (el) => { const url = await mediaUrl(el.dataset.media); if (url) el.src = url; });
+}
+
+/* ============ 畫面：浪點 ============ */
+async function renderSpots() {
+  const spots = await getSpots();
+  $('#app').innerHTML = `
+    <div class="pagehead"><button class="back-btn" id="back">‹</button><div class="pagetitle">我的浪點</div></div>
+    ${spots.map((s) => `
+      <div class="card spot-row">
+        <div class="info">
+          <div class="name">${esc(s.name)}</div>
+          <div class="coords">${s.lat.toFixed(3)}, ${s.lng.toFixed(3)}${s.swelleyeUrl ? ' · swelleye ✓' : ''}</div>
+        </div>
+        <button class="del" data-id="${s.id}">刪除</button>
+      </div>`).join('')}
+    <div class="section-title">新增浪點</div>
+    <div class="field"><label>名稱</label><input id="s-name" placeholder="例如：磯崎"></div>
+    <div class="row">
+      <div class="field"><label>緯度</label><input id="s-lat" inputmode="decimal" placeholder="23.71"></div>
+      <div class="field"><label>經度</label><input id="s-lng" inputmode="decimal" placeholder="121.55"></div>
+    </div>
+    <div class="field"><label>Swelleye 頁面連結（選填）</label><input id="s-eye" placeholder="https://swelleye.com/…"></div>
+    <button class="btn btn-accent" id="s-add">新增</button>
+    <div class="hint">經緯度在 Google Maps 長按地點就會出現，複製過來即可。</div>`;
+
+  $('#back').addEventListener('click', () => { location.hash = '#/'; });
+  $('#s-add').addEventListener('click', async () => {
+    const name = $('#s-name').value.trim();
+    const lat = num($('#s-lat').value);
+    const lng = num($('#s-lng').value);
+    if (!name || lat == null || lng == null) { toast('請填浪點名稱和經緯度'); return; }
+    const next = [...spots, { id: uid(), name, lat, lng, swelleyeUrl: $('#s-eye').value.trim() }];
+    await kvSet('spots', next);
+    await kvSet('dirty:spots', true);
+    syncNow(true);
+    renderSpots();
+  });
+  $$('.spot-row .del').forEach((b) => b.addEventListener('click', async () => {
+    const s = spots.find((x) => x.id === b.dataset.id);
+    if (!confirm(`刪除「${s.name}」？已存在的記錄不受影響。`)) return;
+    await kvSet('spots', spots.filter((x) => x.id !== b.dataset.id));
+    await kvSet('dirty:spots', true);
+    syncNow(true);
+    renderSpots();
+  }));
+}
+
+/* ============ 畫面：設定 ============ */
+async function renderSettings() {
+  const s = await getSettings();
+  $('#app').innerHTML = `
+    <div class="pagehead"><button class="back-btn" id="back">‹</button><div class="pagetitle">設定</div></div>
+
+    <div class="section-title">GitHub 同步（你的雲端資料庫）</div>
+    <div class="field"><label>GitHub token（fine-grained，只授權 ${esc(s.ghOwner)}/${esc(s.ghRepo)} 的 Contents 讀寫）</label><input id="g-token" type="password" placeholder="github_pat_…" value="${esc(s.ghToken ?? '')}"></div>
+    <div class="row">
+      <div class="field"><label>帳號</label><input id="g-owner" value="${esc(s.ghOwner)}"></div>
+      <div class="field"><label>資料 repo（私人）</label><input id="g-repo" value="${esc(s.ghRepo)}"></div>
+    </div>
+    <button class="btn btn-ghost" id="restore">☁️ 從雲端還原全部記錄</button>
+
+    <div class="section-title">AI 分析</div>
+    <div class="field"><label>Anthropic API key</label><input id="a-key" type="password" placeholder="sk-ant-…" value="${esc(s.anthropicKey ?? '')}"></div>
+    <div class="field"><label>模型</label><input id="a-model" value="${esc(s.model)}"></div>
+
+    <div style="height:12px"></div>
+    <button class="btn btn-accent" id="save">儲存設定</button>
+    <button class="btn btn-ghost" id="export">匯出 JSON 備份（不含照片檔）</button>
+    <div class="hint">
+      兩組 key 都只存在你手機本機（這個瀏覽器的儲存空間），不會上傳到任何伺服器；同步時直接從手機連 GitHub，AI 分析時直接連 Anthropic。
+      <br><br>GitHub token 申請：github.com → Settings → Developer settings → Fine-grained tokens → 只選 ${esc(s.ghRepo)} 這個 repo、Permissions 給 Contents「Read and write」。
+      <br><br>Anthropic key 申請：console.anthropic.com。每次 AI 分析約用 3–5 張畫面，費用通常不到一元台幣。
+    </div>`;
+
+  $('#back').addEventListener('click', () => { location.hash = '#/'; });
+  $('#save').addEventListener('click', async () => {
+    await kvSet('settings', {
+      ghToken: $('#g-token').value.trim() || undefined,
+      ghOwner: $('#g-owner').value.trim() || GH_OWNER_DEFAULT,
+      ghRepo: $('#g-repo').value.trim() || GH_REPO_DEFAULT,
+      anthropicKey: $('#a-key').value.trim() || undefined,
+      model: $('#a-model').value.trim() || DEFAULT_MODEL,
+    });
+    toast('已儲存');
+  });
+  $('#export').addEventListener('click', exportBackup);
+  $('#restore').addEventListener('click', async () => {
+    if (!confirm('從雲端下載全部記錄到這支手機？（本機同名記錄會被雲端版本覆蓋）')) return;
+    const btn = $('#restore');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>還原中…';
+    try { await restoreFromCloud(); } catch (e) { toast('還原失敗：' + e.message, 4000); }
+    btn.disabled = false;
+    btn.textContent = '☁️ 從雲端還原全部記錄';
+  });
+}
+
+/* ============ Router ============ */
+function route() {
+  const hash = location.hash || '#/';
+  window.scrollTo(0, 0);
+  if (hash === '#/' || hash === '') renderHome();
+  else if (hash === '#/new') renderEdit(null);
+  else if (hash.startsWith('#/edit/')) renderEdit(hash.slice(7));
+  else if (hash.startsWith('#/session/')) renderDetail(hash.slice(10));
+  else if (hash === '#/spots') renderSpots();
+  else if (hash === '#/settings') renderSettings();
+  else renderHome();
+}
+window.addEventListener('hashchange', route);
+
+/* ============ 啟動 ============ */
+(async function init() {
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  await getSpots(); // 首次啟動播種預設浪點
+  route();
+})();
+</script>
+</body>
+</html>
