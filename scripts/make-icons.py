@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""產生浪日誌的 PWA icon（純 stdlib，不需要 PIL）：深海漸層＋白色浪線。"""
+"""產生浪日誌的 PWA icon（純 stdlib，不需要 PIL）：復古衝浪配色——奶油底＋丹寧藍浪線＋三色條紋。"""
 import math
 import struct
 import zlib
 
-BG_TOP = (10, 22, 34)      # #0A1622
-BG_BOT = (18, 54, 66)      # 深海青
-FOAM = (79, 209, 197)      # #4FD1C5
-WHITE = (234, 242, 247)
+CREAM_TOP = (247, 243, 232)   # #F7F3E8
+CREAM_BOT = (241, 234, 218)
+DENIM = (47, 74, 92)          # #2F4A5C
+MUSTARD = (227, 180, 88)      # #E3B458
+ORANGE = (217, 122, 80)       # #D97A50
+STEEL = (143, 180, 198)       # #8FB4C6
 
 
 def lerp(a, b, t):
@@ -16,18 +18,16 @@ def lerp(a, b, t):
 
 def pixel(x, y, size):
     t = y / size
-    color = lerp(BG_TOP, BG_BOT, t)
-    # 三條浪線，往下漸淡
-    for i, (cy, amp, thick, tone) in enumerate([
-        (0.52, 0.055, 0.030, WHITE),
-        (0.64, 0.045, 0.022, FOAM),
-        (0.76, 0.035, 0.016, lerp(FOAM, BG_BOT, 0.45)),
-    ]):
-        wave_y = size * (cy + amp * math.sin(2 * math.pi * (x / size) * 1.4 + i * 1.1))
-        d = abs(y - wave_y) / (size * thick)
-        if d < 1:
-            a = (1 - d) ** 1.5
-            color = lerp(color, tone, a)
+    color = lerp(CREAM_TOP, CREAM_BOT, t)
+    # 丹寧藍浪線（上半部）
+    wave_y = size * (0.36 + 0.075 * math.sin(2 * math.pi * (x / size) * 1.3 + 0.6))
+    d = abs(y - wave_y) / (size * 0.034)
+    if d < 1:
+        color = lerp(color, DENIM, (1 - d) ** 1.4)
+    # 三色條紋（下半部），帶奶油間隔
+    for cy, tone in [(0.66, MUSTARD), (0.75, ORANGE), (0.84, STEEL)]:
+        if abs(t - cy) < 0.032:
+            color = tone
     return color
 
 
