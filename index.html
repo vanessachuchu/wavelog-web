@@ -381,6 +381,10 @@ function windyEmbedUrl(spot) {
     `&zoom=10&level=surface&overlay=waves&menu=&message=true&marker=true&calendar=now&type=map&location=coordinates` +
     `&metricWind=km%2Fh&metricTemp=%C2%B0C`;
 }
+// Swelleye 自家浪點頁就是用這個座標式內嵌頁載入預報；非官方嵌入服務，哪天失效就只是顯示不出來
+function swelleyeForecastUrl(spot) {
+  return `https://swelleye.com/forecast.html?lt=${spot.lat}&ln=${spot.lng}&lang=zh`;
+}
 
 /* ============ AI 分析 ============ */
 function buildAiPrompt(session, spot) {
@@ -636,7 +640,7 @@ async function renderHome() {
     const firstImg = s.media.find((m) => m.kind === 'image');
     listHtml += `
       <div class="card session-card" data-id="${s.id}">
-        ${firstImg ? `<img class="thumb" data-media="${esc(firstImg.key)}" alt="">` : `<div class="thumb">🌊</div>`}
+        ${firstImg ? `<img class="thumb" data-media="${esc(firstImg.key)}" alt="">` : `<img class="thumb" src="icons/illustration.svg" alt="">`}
         <div class="info">
           <div class="spot">${esc(spot ? spot.name : '未知浪點')}</div>
           <div class="meta">${s.dateISO.slice(5, 10).replace('-', '/')} ${s.dateISO.slice(11, 16)} · ${Math.round(s.durationMin / 6) / 10} 小時</div>
@@ -659,7 +663,7 @@ async function renderHome() {
       ${unsynced > 0 ? `<span class="warn">● ${unsynced} 筆未同步</span> · ` : ''}
       ${lastSync ? `上次同步 ${lastSync.slice(5, 16).replace('T', ' ')}` : '尚未同步過'} · <a href="#" id="sync-now">立即同步</a>
     </div>
-    ${sessions.length === 0 ? `<div class="empty"><div class="big">🏄‍♀️</div><p>還沒有記錄。<br>下水回來，按下面的按鈕記下今天的浪。</p></div>` : listHtml}
+    ${sessions.length === 0 ? `<div class="empty"><img src="icons/illustration.svg" alt="" style="width:230px;max-width:75%;border-radius:24px"><p>還沒有記錄。<br>下水回來，按下面的按鈕記下今天的浪。</p></div>` : listHtml}
     <button class="fab" id="fab">＋ 記錄一次下水</button>`;
 
   $('#fab').addEventListener('click', () => { location.hash = '#/new'; });
@@ -706,6 +710,8 @@ async function renderEdit(editId) {
 
     <div class="section-title">浪況</div>
     <div id="windy-slot"><button class="btn btn-ghost" id="show-windy">🌀 顯示 Windy 浪圖</button></div>
+    <div style="height:10px"></div>
+    <div id="eye-slot"><button class="btn btn-ghost" id="show-eye">🌊 顯示 Swelleye 預報</button></div>
     <div style="height:10px"></div>
     <button class="btn btn-ghost" id="grab-forecast">⚡ 抓當時的預報（Open-Meteo）</button>
     <div class="note-accent" id="forecast-note" ${state.forecast ? '' : 'hidden'}>${state.forecast ? forecastNoteText(state.forecast) : ''}</div>
@@ -775,7 +781,9 @@ async function renderEdit(editId) {
     state.spotId = c.dataset.id;
     $$('#spot-chips .spot').forEach((x) => x.classList.toggle('active', x === c));
     $('#windy-slot').innerHTML = '<button class="btn btn-ghost" id="show-windy">🌀 顯示 Windy 浪圖</button>';
+    $('#eye-slot').innerHTML = '<button class="btn btn-ghost" id="show-eye">🌊 顯示 Swelleye 預報</button>';
     wireWindy();
+    wireEye();
   }));
   $$('#dur-chips .dur').forEach((c) => c.addEventListener('click', () => {
     state.durationMin = Number(c.dataset.d);
@@ -792,7 +800,15 @@ async function renderEdit(editId) {
       if (spot) $('#windy-slot').innerHTML = `<div class="windy-box"><iframe src="${windyEmbedUrl(spot)}" loading="lazy"></iframe></div>`;
     });
   }
+  function wireEye() {
+    const btn = $('#show-eye');
+    if (btn) btn.addEventListener('click', () => {
+      const spot = spots.find((s) => s.id === state.spotId);
+      if (spot) $('#eye-slot').innerHTML = `<div class="windy-box"><iframe src="${swelleyeForecastUrl(spot)}" style="height:480px" loading="lazy"></iframe></div>`;
+    });
+  }
   wireWindy();
+  wireEye();
 
   $('#grab-forecast').addEventListener('click', async () => {
     const spot = spots.find((s) => s.id === state.spotId);
@@ -903,10 +919,12 @@ async function renderDetail(id) {
     ${spot ? `
     <div class="link-row">
       <a href="#" id="toggle-windy">🌀 Windy 浪圖</a>
+      <a href="#" id="toggle-eye">🌊 Swelleye 預報</a>
       <a href="${esc(spot.swelleyeUrl || SWELLEYE_HOME)}" target="_blank" rel="noopener">Swelleye ↗</a>
       <a href="https://www.windy.com/${spot.lat.toFixed(3)}/${spot.lng.toFixed(3)}?waves,${spot.lat.toFixed(3)},${spot.lng.toFixed(3)},11" target="_blank" rel="noopener">開 Windy 網站 ↗</a>
     </div>
-    <div id="windy-slot" style="margin-top:10px"></div>` : ''}
+    <div id="windy-slot" style="margin-top:10px"></div>
+    <div id="eye-slot" style="margin-top:10px"></div>` : ''}
 
     ${(session.wavesCaught != null || session.focus || session.notes) ? `
     <div class="section-title">表現與心得</div>
@@ -955,6 +973,12 @@ async function renderDetail(id) {
     e.preventDefault();
     const slot = $('#windy-slot');
     slot.innerHTML = slot.innerHTML ? '' : `<div class="windy-box"><iframe src="${windyEmbedUrl(spot)}" loading="lazy"></iframe></div>`;
+  });
+  const toggleEye = $('#toggle-eye');
+  if (toggleEye) toggleEye.addEventListener('click', (e) => {
+    e.preventDefault();
+    const slot = $('#eye-slot');
+    slot.innerHTML = slot.innerHTML ? '' : `<div class="windy-box"><iframe src="${swelleyeForecastUrl(spot)}" style="height:480px" loading="lazy"></iframe></div>`;
   });
   const detailMedia = $('#detail-media');
   if (detailMedia) $$('.cell', detailMedia).forEach((cell) => cell.addEventListener('click', () => {

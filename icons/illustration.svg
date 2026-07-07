@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 浪日誌吉祥插圖：復古可愛衝浪女孩 -->
+  <defs>
+    <clipPath id="frame"><rect width="512" height="512" rx="0"/></clipPath>
+  </defs>
+  <g clip-path="url(#frame)">
+    <!-- 奶油底 -->
+    <rect width="512" height="512" fill="#F6F1E6"/>
+
+    <!-- 太陽 -->
+    <circle cx="392" cy="120" r="56" fill="#E3B458"/>
+    <circle cx="392" cy="120" r="72" fill="none" stroke="#E3B458" stroke-width="6" stroke-dasharray="2 26" stroke-linecap="round"/>
+
+    <!-- 遠方小雲 -->
+    <g fill="#FDFAF1" stroke="#DCD2BC" stroke-width="4">
+      <ellipse cx="110" cy="110" rx="40" ry="16"/>
+      <ellipse cx="146" cy="96" rx="28" ry="13"/>
+    </g>
+
+    <!-- 大浪本體 -->
+    <path d="M -20 512 L -20 330
+             C 60 300, 120 310, 170 280
+             C 240 238, 250 170, 210 140
+             C 300 150, 360 230, 380 300
+             C 420 320, 470 330, 532 322
+             L 532 512 Z"
+          fill="#2F4A5C"/>
+    <!-- 浪的內層（灰藍） -->
+    <path d="M -20 512 L -20 370
+             C 70 345, 150 350, 210 320
+             C 280 285, 330 300, 380 340
+             C 430 360, 480 362, 532 355
+             L 532 512 Z"
+          fill="#8FB4C6"/>
+
+    <!-- 浪頭捲曲＋泡泡 -->
+    <g fill="#FDFAF1">
+      <path d="M 210 140
+               C 165 138, 140 170, 148 205
+               C 154 178, 172 162, 200 162
+               C 190 175, 186 190, 192 204
+               C 200 180, 220 168, 245 172
+               C 232 155, 222 145, 210 140 Z"/>
+      <circle cx="150" cy="212" r="16"/>
+      <circle cx="176" cy="224" r="12"/>
+      <circle cx="200" cy="212" r="10"/>
+      <circle cx="132" cy="236" r="10"/>
+      <circle cx="160" cy="244" r="8"/>
+    </g>
+
+    <!-- 浪面泡沫線 -->
+    <path d="M 40 400 C 90 385, 150 388, 200 400 M 260 372 C 310 358, 370 362, 420 378"
+          fill="none" stroke="#FDFAF1" stroke-width="7" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- 衝浪板 -->
+    <g transform="translate(300 330) rotate(-14)">
+      <ellipse cx="0" cy="0" rx="98" ry="20" fill="#FDFAF1" stroke="#E3B458" stroke-width="5"/>
+      <path d="M -92 0 L 92 0" stroke="#D97A50" stroke-width="7"/>
+    </g>
+
+    <!-- 衝浪女孩（磚橘防寒衣，跟浪對比） -->
+    <g transform="translate(300 330) rotate(-14)">
+      <!-- 後腿（彎） -->
+      <path d="M -6 -16 C -20 -10, -34 -8, -44 -6" fill="none" stroke="#D97A50" stroke-width="14" stroke-linecap="round"/>
+      <!-- 前腿 -->
+      <path d="M 6 -16 C 16 -12, 26 -8, 34 -6" fill="none" stroke="#D97A50" stroke-width="14" stroke-linecap="round"/>
+      <!-- 腳掌 -->
+      <ellipse cx="-46" cy="-4" rx="8" ry="5" fill="#F2C9A7"/>
+      <ellipse cx="36" cy="-4" rx="8" ry="5" fill="#F2C9A7"/>
+      <!-- 身體（磚橘防寒衣） -->
+      <path d="M -12 -20 C -16 -58, 16 -58, 12 -20 Z" fill="#D97A50"/>
+      <rect x="-14" y="-62" width="28" height="46" rx="14" fill="#D97A50"/>
+      <!-- 防寒衣胸前奶油條紋 -->
+      <path d="M -13 -44 L 13 -44" stroke="#F6F1E6" stroke-width="5" stroke-linecap="round"/>
+      <!-- 手臂張開平衡 -->
+      <path d="M -12 -50 C -34 -58, -50 -70, -60 -84" fill="none" stroke="#D97A50" stroke-width="11" stroke-linecap="round"/>
+      <path d="M 12 -50 C 32 -52, 48 -48, 62 -38" fill="none" stroke="#D97A50" stroke-width="11" stroke-linecap="round"/>
+      <!-- 手掌 -->
+      <circle cx="-62" cy="-86" r="7" fill="#F2C9A7"/>
+      <circle cx="64" cy="-37" r="7" fill="#F2C9A7"/>
+      <!-- 頭 -->
+      <circle cx="0" cy="-88" r="26" fill="#F2C9A7"/>
+      <!-- 頭髮＋包包頭 -->
+      <path d="M -26 -90 A 26 26 0 0 1 26 -90 C 20 -104, -20 -104, -26 -90 Z" fill="#5A3E2E"/>
+      <path d="M -26 -88 A 26 26 0 0 1 26 -88 L 26 -96 A 26 26 0 0 0 -26 -96 Z" fill="#5A3E2E"/>
+      <circle cx="0" cy="-116" r="11" fill="#5A3E2E"/>
+      <!-- 臉 -->
+      <circle cx="-9" cy="-86" r="3" fill="#2F4A5C"/>
+      <circle cx="9" cy="-86" r="3" fill="#2F4A5C"/>
+      <path d="M -5 -77 Q 0 -72, 5 -77" fill="none" stroke="#2F4A5C" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="-15" cy="-78" r="4" fill="#E8A48E" opacity="0.7"/>
+      <circle cx="15" cy="-78" r="4" fill="#E8A48E" opacity="0.7"/>
+    </g>
+
+    <!-- 水花 -->
+    <g fill="#8FB4C6">
+      <circle cx="404" cy="310" r="7"/>
+      <circle cx="424" cy="292" r="5"/>
+      <circle cx="438" cy="312" r="4"/>
+    </g>
+  </g>
+</svg>

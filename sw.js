@@ -1,5 +1,5 @@
 // 浪日誌 service worker：app shell 用 network-first（有網路拿最新版，離線用快取）
-const CACHE = 'wavelog-v2';
+const CACHE = 'wavelog-v3';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
