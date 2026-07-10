@@ -527,8 +527,8 @@ async function syncNow(silent = false) {
       tombstones.splice(tombstones.indexOf(path), 1);
       await kvSet('tombstones', tombstones);
     }
-    // 2. 浪點
-    if (await kvGet('dirty:spots')) {
+    // 2. 浪點（有變更、或雲端還沒有 spots.json 時上傳）
+    if ((await kvGet('dirty:spots')) || !(await kvGet('sha:spots.json'))) {
       const spots = await getSpots();
       await ghPushFile('spots.json', btoa(unescape(encodeURIComponent(JSON.stringify(spots, null, 2)))), 'wavelog: 更新浪點');
       await kvDel('dirty:spots');
