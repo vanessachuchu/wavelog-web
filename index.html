@@ -492,7 +492,8 @@ async function ghPushFile(path, base64Content, message) {
   }
   if (!res.ok) {
     if (res.status === 401) throw new Error('GitHub token 無效或過期');
-    if (res.status === 404) throw new Error(`找不到 repo（${path}）——請確認設定的帳號/repo 正確、token 有權限`);
+    if (res.status === 403) throw new Error('token 沒有寫入權限：到 github.com/settings/personal-access-tokens 編輯該 token，確認有勾 wavelog-data、且 Contents 權限是「Read and write」，存檔後直接重試');
+    if (res.status === 404) throw new Error(`找不到 repo（${path}）——請確認設定的帳號/repo 正確、token 有勾這個 repo`);
     throw new Error(`上傳 ${path} 失敗（${res.status}）`);
   }
   const j = await res.json();
